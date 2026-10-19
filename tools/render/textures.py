@@ -103,7 +103,7 @@ def zellige(path, colors, size_m=1.2, tile_m=0.1, px=1536, seed=7):
     im.filter(ImageFilter.GaussianBlur(1.2)).save(path)
 
 
-def alphabet_poster(path, paper, ink, accent, w=1400, h=1900, title=True):
+def alphabet_poster(path, paper, ink, accent, w=1400, h=1900, title=True, letters='asomtavruli'):
     """Плакат: 38 букв асомтаврули (древнее письмо) с подписями мхедрули."""
     im = Image.new('RGB', (w, h), _hex(paper))
     dr = ImageDraw.Draw(im)
@@ -116,11 +116,14 @@ def alphabet_poster(path, paper, ink, accent, w=1400, h=1900, title=True):
     if title:
         dr.text((w / 2, 130), 'ანბანი', font=head, fill=_hex(accent), anchor='mm')
         dr.line([w / 2 - 160, 190, w / 2 + 160, 190], fill=_hex(accent), width=3)
-    for i, ch_ in enumerate(ASOMTAVRULI[:cols * rows]):
+    seq = ASOMTAVRULI if letters == 'asomtavruli' else MKHEDRULI
+    kids = ['#2F4A3F', '#A65A3C', '#C9A04A', '#5A1F2A', '#4E7A8C']
+    for i, ch_ in enumerate(seq[:cols * rows]):
         cx = mx + (i % cols + 0.5) * cw
         cy = my + (i // cols + 0.45) * ch
-        dr.text((cx, cy), ch_, font=big, fill=_hex(ink), anchor='mm')
-        if i < len(MKHEDRULI):
+        dr.text((cx, cy), ch_, font=big, fill=_hex(ink) if letters == 'asomtavruli' else _hex(kids[i % len(kids)]),
+                anchor='mm')
+        if i < len(MKHEDRULI) and letters == 'asomtavruli':
             dr.text((cx, cy + 105), MKHEDRULI[i], font=small, fill=_hex(accent), anchor='mm')
     im.save(path)
 

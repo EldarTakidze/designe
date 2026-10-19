@@ -554,7 +554,14 @@ def build_item(f, K, root):
         o = quad((-W / 2, -D / 2, 0.006), (W / 2, -D / 2, 0.006), (W / 2, D / 2, 0.006), (-W / 2, D / 2, 0.006), rm, inner)
     elif t == 'tv':
         B(W, 0.04, H, 0, 0, Z, K.screen, 0.004)
-    elif t in ('install', 'none', 'robot', 'accent'):
+    elif t == 'accent':
+        acc = S['accent_wall'] or S['accents']
+        B(W, D, CEIL - 0.03, 0, 0, 0, mat('accentwall_' + acc, acc, rough=0.85), 0)
+        # латунные бра над тумбами
+        for sy in (-1, 1):
+            sphere(0.06, sy * 1.25, fy - 0.08, 0.95, emissive('sconce', '#FFE0B8', 8), inner, sub=3)
+            box(0.03, 0.1, 0.03, sy * 1.25, fy - 0.02, 0.92, K.metal, inner, 0.005)
+    elif t in ('install', 'none', 'robot'):
         pass
     elif t == 'wc':
         lathe([(0, 0.0), (0.12, 0.0), (0.18, 0.15), (0.19, 0.38), (0.16, 0.4), (0, 0.4)], 0, by - 0.3, 0, K.ceramic, inner)
@@ -573,7 +580,19 @@ def build_item(f, K, root):
         B(W, D, 0.56, 0, 0, 0, K.ceramic, 0.02, 3)
     elif t == 'shower':
         B(W, D, 0.03, 0, 0, 0, K.ceramic, 0.004)
-        B(W * 0.6, 0.008, 2.0, -W * 0.2, fy, 0.03, K.glass, 0)
+        if ex.get('glass') == 'blocks':
+            gb = mat('glassblock', '#DDEBEE', rough=0.15, trans=0.85, coat=0.5)
+            n = int(W * 0.62 / 0.195)
+            for i in range(n):
+                for k in range(11):
+                    box(0.19, 0.08, 0.19, -W / 2 + 0.1 + i * 0.195, fy + 0.04, 0.03 + k * 0.195, gb, inner, 0.012, 2)
+        else:
+            B(W * 0.6, 0.008, 2.0, -W * 0.2, fy, 0.03, K.glass, 0)
+            B(0.02, 0.02, 2.0, W * 0.1, fy, 0.03, K.metal, 0.002)
+        # тропический душ и смеситель на боковой стене
+        cyl(0.13, 0.01, 0, 0.1, 2.15, K.metal, inner, 32)
+        box(0.05, 0.05, 0.25, W / 2 - 0.03, 0.1, 1.0, K.metal, inner, 0.01)
+        box(0.3, 0.1, 0.02, W / 2 - 0.05, by - 0.2, 1.3, K.ceramic, inner, 0.004)
     elif t == 'loft':
         pass
     else:
@@ -625,12 +644,16 @@ def pendant(x, y, z_bottom, kind, K, root, color):
     link(o)
 
 
-def wall_art(p0, p1, z0, z1, img, K, root, frame=0.02, depth=0.03, framed=True):
-    """Картина на стене: p0→p1 вдоль стены (Blender XY), лицо смотрит влево от направления."""
+def wall_art(p0, p1, z0, z1, img, K, root, frame=0.02, depth=0.03, framed=True, toward=None):
+    """Картина на стене: p0→p1 вдоль стены (Blender XY), лицо смотрит влево от направления
+    (или в сторону точки toward)."""
     (x0, y0), (x1, y1) = p0, p1
     dx, dy = x1 - x0, y1 - y0
     L = math.hypot(dx, dy)
     nx, ny = -dy / L, dx / L
+    if toward is not None and (toward[0] - (x0 + x1) / 2) * nx + (toward[1] - (y0 + y1) / 2) * ny < 0:
+        (x0, y0), (x1, y1) = (x1, y1), (x0, y0)
+        dx, dy, nx, ny = -dx, -dy, -nx, -ny
     m = mat('art_' + os.path.basename(img), tex=img, coords='UV', rough=0.8)
     off = depth + 0.002
     quad((x0 + nx * off, y0 + ny * off, z0), (x1 + nx * off, y1 + ny * off, z0), (x1 + nx * off, y1 + ny * off, z1),
@@ -827,10 +850,28 @@ def decorate(variant, style_key, K, v):
         uu = 7.8
         x, y = (uu * c - vv * s) * 1000, (uu * s + vv * c) * 1000
         pendant(*P(x, y), 1.62, S['pendant'], K, root, S['pendant_color'])
-    # точечные светильники в потолке холла и гостиной
-    for (x, y) in [(5000, 4300), (5000, 5800), (7400, 4300), (8600, 4700), (7500, 2300), (8700, 1000), (10500, 2400)]:
+    # точечные светильники в потолке всех помещений (сетка ~1,5 м)
+    spots = []
+    for r in v['rooms']:
+        pg = Polygon(r['poly'])
+        inner = pg.buffer(-450)
+        minx, miny, maxx, maxy = pg.bounds
+        pts = []
+        yy = miny + 700
+        while yy < maxy:
+            xx = minx + 700
+            while xx < maxx:
+                if inner.contains(Point(xx, yy)):
+                    pts.append((xx, yy, r['floor']))
+                xx += 1500
+            yy += 1500
+        if not pts:
+            c = pg.representative_point()
+            pts = [(c.x, c.y, r['floor'])]
+        spots += pts
+    for (x, y, fl) in spots:
         L = bpy.data.lights.new('spot', 'SPOT')
-        L.energy = 28
+        L.energy = 40 if fl == 'tile' else 26
         L.spot_size = math.radians(70)
         L.spot_blend = 0.6
         L.color = (1.0, 0.84, 0.66)
@@ -873,11 +914,75 @@ def decorate(variant, style_key, K, v):
     x0, y0 = P(6700, 1150)
     x1, y1 = P(8700, 2950)
     quad((x0, y1, 0.006), (x1, y1, 0.006), (x1, y0, 0.006), (x0, y0, 0.006), rm, root)
+    decorate_rooms(variant, style_key, K, v, root)
     # вазы и книги на буфете
     if variant == 'B':
         bx, by = P(6320, 3400)
         lathe([(0, 0), (0.06, 0), (0.09, 0.12), (0.05, 0.3), (0.03, 0.34), (0, 0.34)], bx, by + 0.1, 0.88, K.terracotta,
               root)
+
+
+def R2N(u, vv):
+    c, s = math.cos(math.radians(43.75)), math.sin(math.radians(43.75))
+    return (u * c - vv * s) * 1000, (u * s + vv * c) * 1000
+
+
+def decorate_rooms(variant, style_key, K, v, root):
+    """Спальни, детская, санузлы: плитка на стенах, картины, детская азбука."""
+    S = K.S
+    # плитка на стенах санузлов (в мастер-санузле до 1,2 м, выше покраска)
+    door_cuts = unary_union([LineString([d['a'], d['b']]).buffer(260, cap_style=2) for d in v['doors']])
+    if S['bath_wall'] == 'zellige':
+        tile_m = K.zellige
+    else:
+        tw = os.path.join(TEX, f'bathwall_{style_key}.png')
+        if not os.path.exists(tw):
+            TX.tile(tw, S['bath_wall'], '#CFC8BD', tile_w=0.3, tile_h=0.6, var=0.02)
+        tile_m = mat('bathwall_' + style_key, tex=tw, size=2.4, rough=0.2, coat=0.3)
+    for r in v['rooms']:
+        if r['floor'] != 'tile':
+            continue
+        pg = Polygon(r['poly'])
+        c = pg.representative_point()
+        La = bpy.data.lights.new('bathlight', 'AREA')
+        La.size = 0.6
+        La.energy = 120
+        La.color = (1.0, 0.9, 0.8)
+        lo = bpy.data.objects.new('bathlight', La)
+        lo.location = (*P(c.x, c.y), CEIL - 0.05)
+        link(lo)
+        ring = pg.buffer(30, join_style=2).difference(pg.buffer(-12, join_style=2)).difference(door_cuts)
+        H = 1.2 if r['name'] == 'Мастер-санузел' else 2.2
+        for pr in ([ring] if ring.geom_type == 'Polygon' else ring.geoms):
+            if pr.area > 1000:
+                extrude(pr, 0.0, H, tile_m, 'tilewall')
+    rooms = {r['name']: r for r in v['rooms']}
+
+    def at(name):
+        r = rooms.get(name)
+        return P(*r['label']) if r else None
+    # картина над кроватью в мастер-спальне — горы (силуэт Кавказа)
+    mp = os.path.join(TEX, f'mount_{style_key}.png')
+    TX.art(mp, ['#EFE7DA', '#C9A04A', '#A65A3C', '#2F4A3F', '#5A1F2A'], kind='mountains')
+    if at('Мастер-спальня'):
+        a, b = P(*R2N(16.73, -4.95)), P(*R2N(16.73, -3.85))
+        wall_art(a, b, 1.35, 2.35, mp, K, root, toward=at('Мастер-спальня'))
+    # детская: азбука мхедрули над шкафчиками с игрушками
+    kp = os.path.join(TEX, f'kids_{style_key}.png')
+    TX.alphabet_poster(kp, '#F6F1E7', '#2F4A3F', '#A65A3C', letters='mkhedruli')
+    if at('Детская'):
+        a, b = P(*R2N(10.29, -5.9)), P(*R2N(10.29, -4.5))
+        wall_art(a, b, 1.15, 2.45, kp, K, root, toward=at('Детская'))
+    # комнаты Майи и Вари: по картине над изголовьем / у стола
+    ap_ = os.path.join(TEX, f'arches_{style_key}.png')
+    TX.art(ap_, ['#EFE7DA', '#A65A3C', '#C9A04A', '#2F4A3F'], kind='arches')
+    if at('Комната Вари'):
+        wall_art(P(2600, 3640), P(1300, 3640), 1.3, 2.3, ap_, K, root, toward=at('Комната Вари'))
+    if at('Комната Майи'):
+        x = 5915 if variant == 'B' else 6395
+        wall_art(P(x, 1900), P(x, 3000), 1.25, 2.15, mp, K, root, toward=at('Комната Майи'))
+    # прихожая: квеври и коврик
+    qvevri(*P(4600, 4600), 0.6, K, root)
 
 
 def world_and_render(args, sun_from):
@@ -952,6 +1057,15 @@ VIEWS = {
     'kl_entry': dict(cam=(8100, 5150), tgt=(7200, 800), z=1.45, lens=16),
     'kl_window': dict(cam=(11000, 1800), tgt=(6400, 3300), z=1.45, lens=16),
     'kl_kitchen': dict(cam=(7250, 2750), tgt=(11200, 2400), z=1.45, lens=16),
+    'master': dict(cam=(11670, 7985), tgt=(15233, 7660), z=1.45, lens=16),
+    'kids': dict(cam=(10008, 4874), tgt=(13408, 5083), z=1.35, lens=15),
+    'master_bath': dict(cam=R2N(15.3, -1.75), tgt=R2N(15.95, 2.4), z=1.5, lens=13, exp=0.8),
+    'bath2': dict(cam=R2N(12.55, -1.55), tgt=R2N(12.75, 2.3), z=1.5, lens=13, exp=0.8),
+    'kids2': dict(cam=(R2N(12.4, -4.0)), tgt=(R2N(10.3, -5.6)), z=1.35, lens=15),
+    'maya': dict(cam=(4300, 3500), tgt=(5100, 500), z=1.45, lens=15),
+    'varya': dict(cam=(2900, 3450), tgt=(1000, 500), z=1.45, lens=15),
+    'bath3': dict(cam=(1700, 4150), tgt=(500, 6700), z=1.5, lens=14, exp=0.8),
+    'entry': dict(cam=(5150, 6550), tgt=(5900, 3000), z=1.5, lens=15, exp=0.2),
 }
 
 
@@ -990,6 +1104,7 @@ def main():
     K = Kit(STYLES[args.style], args.style)
     v, data = build(args.variant, args.style, K)
     decorate(args.variant, args.style, K, v)
+    args.exposure += VIEWS[args.view].get('exp', 0.0)
     world_and_render(args, sun_from=(28, 35))
     camera(args.view)
     if args.blend:
