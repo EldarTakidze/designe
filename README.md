@@ -4,7 +4,8 @@
 
 - `tools/source_walls.json` — стены, извлечённые из векторного PDF (мм; монолит / газоблок).
 - `tools/geom.py` — геометрия и системы координат (N — как на чертеже, R — повернутое на 43,75° крыло).
-- `tools/design.py` — варианты A и B: демонтаж, новые перегородки, двери, помещения, мебель → `data/project.json`.
+- `tools/design.py` — рабочий вариант: демонтаж, новые перегородки, двери, помещения, мебель → `data/project.json`.
+- `tools/ergonomics.py` — проверка зон подхода к мебели и распашных дверей (нормы — `.claude/skills/interior-ergonomics/SKILL.md`).
 - `tools/render_check.py` — быстрый PNG-рендер для проверки.
 - `tools/build_page.py` — собирает `site/index.html` (2D-план, 3D, прогулка) из `site/template.html`.
 

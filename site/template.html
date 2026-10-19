@@ -78,6 +78,16 @@ table.rooms small{display:block;color:var(--muted);font-size:12px;line-height:1.
 .sect-title{font:700 20px/1.2 var(--f-display);margin:38px 0 6px;text-wrap:balance}
 .lead{color:var(--muted);max-width:75ch;margin:0}
 .q li{list-style:decimal}
+.ergo-wrap{overflow-x:auto;background:var(--sheet);border:1px solid var(--rule);margin-top:12px}
+table.ergo{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:560px}
+table.ergo th{font:600 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:12px 14px;border-bottom:1px solid var(--rule)}
+table.ergo td{padding:8px 14px;border-top:1px solid var(--rule);vertical-align:top}
+table.ergo td.num{font:13px var(--f-mono);text-align:right;white-space:nowrap}
+.pill{display:inline-block;font:600 11px/1 var(--f-body);padding:4px 8px;border-radius:999px;white-space:nowrap}
+.pill.ok{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.pill.tight{background:color-mix(in srgb,var(--build) 22%,transparent);color:var(--build)}
+.pill.bad{background:color-mix(in srgb,var(--demo) 20%,transparent);color:var(--demo)}
+table.ergo tr.grp td{font:600 13px var(--f-body);background:color-mix(in srgb,var(--ink) 4%,transparent)}
 kbd{font:12px var(--f-mono);border:1px solid var(--rule);border-bottom-width:2px;border-radius:4px;padding:0 4px}
 .err{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--muted)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
@@ -107,6 +117,7 @@ kbd{font:12px var(--f-mono);border:1px solid var(--rule);border-bottom-width:2px
       <div class="toolbar" id="tbPlan">
         <button class="chip" id="lFurn" aria-pressed="true">Мебель</button>
         <button class="chip" id="lDemo" aria-pressed="true">Демонтаж / монтаж</button>
+        <button class="chip" id="lErgo" aria-pressed="false">Зоны подхода</button>
         <button class="chip" id="lDims" aria-pressed="false">Сетка 1 м</button>
         <button class="chip" id="fit">Вписать</button>
       </div>
@@ -139,24 +150,27 @@ kbd{font:12px var(--f-mono);border:1px solid var(--rule);border-bottom-width:2px
   </div>
 
   <h2 class="sect-title">Как разложено</h2>
-  <p class="lead">Окна есть только в пяти комнатах: 4, 5, 6, 7 и 8. Вам нужно ровно пять: кухня-гостиная и четыре спальни. Мокрые зоны стоят у пяти стояков, поэтому планировка во многом задана самой квартирой. Варианты отличаются помещением 12: в A там детская гардеробная с глажкой, в B гостевой санузел и кладовая из прихожей.</p>
+  <p class="lead">Окна есть только в пяти комнатах: 4, 5, 6, 7 и 8. Вам нужно ровно пять: кухня-гостиная и четыре спальни. Мокрые зоны стоят у пяти стояков. Внутри этих рамок я разложил квартиру по зонам: дневная у входа и кухни, детская и родители в крыле, Варя дальше всех от шума.</p>
   <div class="notes" id="notes"></div>
 
-  <h2 class="sect-title">Вопросы к вам</h2>
+  <h2 class="sect-title">День большой семьи</h2>
+  <p class="lead">Как квартира работает в обычный день. Каждый сценарий проверен по плану: кто куда идёт и где оставляет вещи.</p>
+  <div class="notes" id="days"></div>
+
+  <h2 class="sect-title">Проверка эргономики</h2>
+  <p class="lead" id="ergoLead"></p>
+  <div class="ergo-wrap"><table class="ergo" id="ergo"></table></div>
+
+  <h2 class="sect-title">Открытые вопросы</h2>
   <div class="notes">
     <div class="card"><ul class="q">
-      <li>Кровати Майи и Вари: «120×80» — это 120×200? Я заложил 1200×2000 мм.</li>
-      <li>В ванной 2 в списке нет унитаза. Я его оставил у стояка: мальчикам будет удобнее. Убрать?</li>
-      <li>Нужен ли гостевой санузел у кухни-гостиной (вариант B), или гости ходят в ванную 2?</li>
-      <li>Нико 3 года. Сейчас ему стоит кровать 800×1600, на вырост. Или сразу три спальных места в одной системе: двухъярусная плюс выдвижная?</li>
-      <li>Рабочее место в спальне: нужен полноценный стол для ноутбука и монитора, или хватит консоли 1,2 м у окна?</li>
+      <li>В спальне комод под ТВ оставляет в ногах кровати проход 0,7 м. Если повесить ТВ на стену, а комод перенести в гардеробную, проход станет 1,1 м. Что выбираете?</li>
+      <li>Наверх кладём Гио и Лео (7 и 6 лет), Нико (3 года) спит внизу под Гио. Подходит?</li>
+      <li>Детский стол на двоих 1,9 м, по 95 см на человека. Нужно шире? Тогда верхнюю кровать Гио придётся сдвинуть от окна.</li>
     </ul></div>
-    <div class="card"><ul class="q" start="6">
-      <li>Тёплый пол в гостиной: водяной от коллектора или электрический? Водяной в монолитных домах обычно запрещён УК.</li>
-      <li>Проточный водонагреватель ставим как резерв на время отключений горячей воды или как основной?</li>
-      <li>Стол на 10–15 человек: раздвижной 2,0 → 2,8 м плюс посадка на диване. Нужен ли отдельный складной стол «на праздники»?</li>
-      <li>Какую технику уже присмотрели: ширину холодильника (60 или 75–90), винный шкаф (на 18 или 40+ бутылок)?</li>
-      <li>Стиль и цвета: есть референсы (Pinterest, фото)? Пока в модели нейтральная палитра: дуб, белый, серо-зелёный.</li>
+    <div class="card"><ul class="q" start="4">
+      <li>Отложено по вашей просьбе: тёплый пол в гостиной, проточный водонагреватель, стол на праздники.</li>
+      <li>Стиль и цвета: есть референсы? Пока в модели нейтральная палитра: дуб, белый, серо-зелёный.</li>
     </ul></div>
   </div>
 </div>
@@ -166,12 +180,12 @@ kbd{font:12px var(--f-mono);border:1px solid var(--rule);border-bottom-width:2px
 <script>
 // ---------- данные и общее состояние ----------
 const P = JSON.parse(document.getElementById('project').textContent);
-const S = { v: 'A', mode: 'plan', furn: true, demo: true, grid: false, room: null };
+const S = { v: 'A', mode: 'plan', furn: true, demo: true, grid: false, ergo: false, room: null };
 try { const s = JSON.parse(localStorage.getItem('shagal-ui') || '{}'); Object.assign(S, s.v ? { v: s.v } : {}); } catch (e) {}
 const save = () => { try { localStorage.setItem('shagal-ui', JSON.stringify({ v: S.v })); } catch (e) {} };
 const V = () => P.variants.find(x => x.id === S.v);
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const ROOM_NO = { 'Комната Майи': '4', 'Комната Вари': '5', 'Кухня-гостиная': '6', 'Детская': '7', 'Мастер-спальня': '8', 'Мастер-санузел': '9–10', 'Гардеробная': '9–10', 'Ванная 2': '11', 'Гардеробная 2': '12', 'Гостевой санузел': '12', 'Кладовая': '12', 'Ванна 3': '3', 'Гардеробная 3': '2', 'Прихожая и холл': '1', 'Коридор': '1' };
+const ROOM_NO = { 'Комната Вари': '4', 'Комната Майи': '5', 'Кухня-гостиная': '6', 'Детская': '7', 'Мастер-спальня': '8', 'Мастер-санузел': '9–10', 'Гардеробная': '9–10', 'Ванная 2': '11', 'Гардеробная 2': '12', 'Кладовая': '12', 'Ванна 3': '3', 'Гардеробная 3': '2', 'Прихожая и холл': '1', 'Коридор': '1' };
 
 // ---------- 2D план (SVG) ----------
 const svg = document.getElementById('plan');
@@ -194,6 +208,8 @@ function furnSymbol(g, f) {
   // «спинка»: переводим в локальные координаты, где спинка сверху (−y)
   const back = f.back || 'n';
   if (t === 'rug') { R(x0, y0, w, d, 'rug', 60); return; }
+  if (t === 'loft') { R(x0, y0, w, d, 'loft'); return; }
+  if (t === 'robot') { el('circle', { cx: 0, cy: 0, r: Math.min(w, d) * .4, class: 'fu' }, g); return; }
   if (t === 'accent') { R(x0, y0, w, d, 'acc'); return; }
   if (t === 'dryer_rack') { R(x0, y0, w, d, 'dash'); return; }
   R(x0, y0, w, d, t === 'closet' || t === 'wardrobe' ? 'fu cl' : 'fu', ['wc', 'vanity', 'bath', 'pouf', 'coffee'].includes(t) ? 40 : 0);
@@ -244,7 +260,7 @@ function drawPlan() {
   const st = el('style', {}, svg);
   st.textContent = `.fu{fill:var(--furn);stroke:var(--furn-line);stroke-width:18}.cl{fill:color-mix(in srgb,var(--furn) 70%,var(--wood))}
   .fl{stroke:var(--furn-line);stroke-width:14;fill:none}.fl2{fill:none;stroke:var(--furn-line);stroke-width:14}.fl3{stroke:var(--furn-line);stroke-width:8;opacity:.5}
-  .rug{fill:color-mix(in srgb,var(--accent) 14%,transparent);stroke:none}.acc{fill:var(--accent)}.dash{fill:none;stroke:var(--furn-line);stroke-width:10;stroke-dasharray:40 30}
+  .rug{fill:color-mix(in srgb,var(--accent) 14%,transparent);stroke:none}.acc{fill:var(--accent)}.dash{fill:none;stroke:var(--furn-line);stroke-width:10;stroke-dasharray:40 30}.loft{fill:none;stroke:var(--accent);stroke-width:26;stroke-dasharray:90 50}
   .glb{stroke:#7fb7d8;stroke-width:70}.glc{stroke:#7fb7d8;stroke-width:24}
   .rname{font:600 220px var(--f-body);fill:var(--ink)}.rarea{font:400 170px var(--f-mono);fill:var(--muted)}
   .flab{font:400 105px var(--f-body);fill:var(--muted)}`;
@@ -287,6 +303,12 @@ function drawPlan() {
   });
   // стояки
   P.risers.forEach(([x, y]) => el('circle', { cx: x, cy: y, r: 95, fill: 'none', stroke: 'var(--demo)', 'stroke-width': 30 }, svg));
+  // зоны подхода (проверка эргономики)
+  if (S.ergo && v.ergo) {
+    const zg = el('g', {}, svg);
+    const col = { ok: 'var(--accent)', tight: 'var(--build)', bad: 'var(--demo)' };
+    v.ergo.forEach(e => { if (!e.zone || !e.zone.length) return; el('path', { d: 'M' + e.zone.map(q => q.join(' ')).join('L') + 'Z', fill: col[e.status], 'fill-opacity': .28, stroke: col[e.status], 'stroke-width': 14 }, zg); });
+  }
   // мебель
   if (S.furn) {
     const fg = el('g', {}, svg);
@@ -341,7 +363,7 @@ function focusRoom(r) {
 // ---------- экспликация ----------
 function drawRooms() {
   const v = V(); const t = document.getElementById('rooms'); t.innerHTML = '';
-  const order = ['Прихожая и холл', 'Гардеробная 3', 'Кухня-гостиная', 'Комната Майи', 'Комната Вари', 'Ванна 3', 'Детская', 'Ванная 2', 'Коридор', 'Мастер-спальня', 'Гардеробная', 'Мастер-санузел', 'Гардеробная 2', 'Гостевой санузел', 'Кладовая'];
+  const order = ['Прихожая и холл', 'Гардеробная 3', 'Кладовая', 'Кухня-гостиная', 'Комната Майи', 'Комната Вари', 'Ванна 3', 'Коридор', 'Детская', 'Ванная 2', 'Гардеробная 2', 'Мастер-спальня', 'Гардеробная', 'Мастер-санузел'];
   const rs = [...v.rooms].sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
   const mat = { wood: 'var(--wood)', tile: 'var(--tile)', stone: 'var(--stone)' };
   rs.forEach(r => {
@@ -360,18 +382,38 @@ function drawRooms() {
 // ---------- пояснительная записка ----------
 const NOTES = {
   common: [
-    ['Мастер-блок', ['Спальня 15 м²: кровать 1800 с подъёмным механизмом изголовьем к наружной стене, акцентная стена, подвесные тумбы, розетки у кровати.', 'Напротив кровати комод с ТВ на стене. Рабочее место у окна, встроенный шкаф у перегородки.', 'Гардеробная-проход 1,4 м: стены из ГКЛ, вход через раздвижное зеркало, вытяжка, полки и штанги до потолка. Ночью в санузел светит боковая подсветка.', 'Санузел 6,6 м²: унитаз с инсталляцией у стояка, душ из стеклоблоков, одна раковина, круглое зеркало с подсветкой, шкаф для косметики с подсветкой.']],
-    ['Детская и ванная 2', ['Детская 12,3 м²: стол на двоих 2,4 м у окна, двухъярусная кровать для Гио и Лео, кровать Нико, шкаф из трёх секций по 0,7 м, шкафчики для игрушек, игровой ковёр.', 'Ванная 2 напротив детской: душ с прозрачным стеклом, ниша-полки у душа, одна раковина, стиральная и сушильная машины колонной в шкафу, шкаф для постельного белья.']],
-    ['Кухня-гостиная', ['Кухня 3,3 м вдоль стены: встроенный холодильник, колонна духовка + СВЧ, варочная панель с вытяжкой, морозильник под ней, посудомойка 60, мойка у стояка.', 'У короба стояка кофейная станция: чайник и кофемашина, внизу встроенный винный шкаф, сверху витрина для бокалов.', 'Стол 2,0 м раздвигается до 2,8 м: 8–10 мест плюс угловой диван-кровать на 6–8 мест рядом. Всего 14–15 человек.', 'Перегородка из ГКЛ с нишей под ТВ отделяет гостиную от прохода. Короб под кронштейн закладываем заранее.']],
-    ['Левая часть', ['Комнаты Майи и Вари одинаково укомплектованы: кровать 1200×2000, шкаф, рабочий стол у окна, комод, косметический столик.', 'Ванна 3: ванна 1700 у дальней стены, унитаз с инсталляцией у стояка, одна раковина, шкаф хранения. Вместо полотенцесушителя тёплая стена.', 'Гардеробная 3 у входа: полки до потолка, средний ярус под плечики, внизу открытая обувная зона.', 'Прихожая: шкаф до потолка, пуф, зеркало в рост.']],
-    ['По всему дому', ['Коллекторы: отдельные узлы в ванной 2 и мастер-санузле (стояки разные). Защита от протечек с кранами на вводах.', 'Шумоизоляция всех пяти стояков в коробах. Проточный водонагреватель ставим у коллектора.', 'Тёплый пол во всех санузлах, тёплая стена вместо полотенцесушителей. Карнизы под умный дом: ниши в потолке над всеми окнами.', 'Второй роутер ставим в коридоре крыла: потолочная точка, кабель от щита.']],
+    ['Мастер-блок', ['Спальня 15 м²: кровать 1800 с подъёмным механизмом изголовьем к наружной стене, акцентная стена, подвесные тумбы, розетки у кровати. Сбоку от кровати проход 1 м.', 'Напротив кровати комод 0,4 м с ТВ на стене, рабочее место у окна, шкаф-купе у перегородки.', 'Гардеробная-проход 1,4 м: стены из ГКЛ, вход через раздвижное зеркало, вытяжка, полки и штанги до потолка. Ночью в санузел светит боковая подсветка.', 'Санузел 6,6 м²: унитаз с инсталляцией у стояка, душ из стеклоблоков, одна раковина, круглое зеркало с подсветкой, шкаф для косметики с подсветкой.']],
+    ['Детская', ['Угловая кровать-чердак: два верхних места буквой Г. Под кроватью Лео шкаф на 3 секции по 65 см, у каждого мальчика своя секция с полками и штангой. Под кроватью Гио нижняя кровать Нико.', 'Стол на двоих 1,9 м у окна, низкие шкафчики для игрушек у стены, книжный стеллаж. Центр комнаты свободен под игровую зону 1,5×1,2 м.', 'Ванная 2 через коридор: душ с прозрачным стеклом, ниша-полки, унитаз, раковина, стиральная и сушильная машины в шкафу, шкаф для белья.']],
+    ['Кухня-гостиная и кладовая', ['Кухня 3,3 м: холодильник, духовка + СВЧ, варочная с вытяжкой, морозильник под ней, посудомойка 60, мойка у стояка. От холодильника до мойки 2,7 м по прямой.', 'Кофейная станция у короба: чайник, кофемашина, винный шкаф внизу, витрина для бокалов.', 'Стол 2,0 → 2,8 м и угловой диван-кровать: 14–15 мест. ТВ в нише перегородки.', 'Кладовая 1,8 м² из холла, в 3 м от кухни: запасы продуктов, бытовая химия, пылесос, база робота-пылесоса.']],
+    ['Левая часть', ['Майя в комнате 5, сразу за кухней: ближе всех к столу и кухне, не надо идти через всю квартиру. Кровать вдоль стены, подход с одной стороны 1,3 м. Стену с гостиной усиливаем шумоизоляцией.', 'Варя в дальней комнате 4: тише всего, рядом своя ванная. Кровать вдоль наружной стены, между ней и шкафом проход 1,4 м.', 'В обеих комнатах кровать 1200×2000, шкаф, стол у окна, комод, косметический столик.', 'Ванна 3 для Майи и Вари: ванна 1700 с поручнем, унитаз с инсталляцией у стояка, раковина, шкаф, тёплая стена вместо полотенцесушителя.']],
+    ['Вход', ['Гардеробная 3 с раздвижной дверью: шкаф во всю стену, сверху полки до потолка, посередине плечики, внизу открытая обувная зона. Напротив крючки на детской высоте.', 'В прихожей пуф-скамья с ящиком (сесть и обуться), шкаф до потолка для гостей и каждодневной одежды, зеркало в рост.']],
+    ['По всему дому', ['Отдельные коллекторы в ванной 2 и мастер-санузле, защита от протечек на вводах. Шумоизоляция всех стояков.', 'Тёплый пол во всех санузлах, тёплая стена вместо полотенцесушителей. Ниши под карнизы умного дома над всеми окнами.', 'Второй роутер на потолке в коридоре крыла.']],
   ],
-  A: [['Помещение 12 в варианте A', ['Гардеробная 2: детские вещи и сезонное, откидная гладильная доска, потолочная сушилка. Вход из коридора крыла.']]],
-  B: [['Помещение 12 в варианте B', ['Гостевой санузел 2,5 м² у стояка: гости кухни-гостиной не заходят в детскую часть.', 'Кладовая 1,8 м² с входом из прихожей: детская верхняя одежда, гладильная доска, сушилка. Шкаф в прихожей заменяет обувница.']]],
+  A: [],
 };
+const DAYS = [
+  ['Утро, 7:00–8:30', ['Семь человек и три санузла, очередей нет: родители в своём, мальчики в ванной 2 напротив детской, Майя и Варя в ванне 3.', 'Школьные рюкзаки висят на крючках в детской у двери. Куртки и обувь в гардеробной 3 у выхода: дети одеваются сами, крючки на их высоте.', 'Завтрак: стол стоит у кухни, от мойки до стола 1,2 м.']],
+  ['Стирка', ['Стиралка и сушилка в ванной 2, в центре детской зоны, где больше всего белья. Глажка и сушилка в гардеробной 2, в 3 м от машин. Там же убираются детские вещи.', 'Постельное бельё в шкафу ванной 2: менять удобно без похода через квартиру.']],
+  ['Гости, 10–15 человек', ['Прихожая принимает гостей без затора: шкаф для верхней одежды у двери, отдельно от семейной гардеробной.', 'Стол раздвигается до 2,8 м, часть гостей сидит на диване. Детские и спальни остаются за поворотом крыла и в левой части, гости туда не ходят.', 'Гостевой санузел вы не захотели, поэтому гости пользуются ванной 2: она у коридора крыла, без прохода через спальни.']],
+  ['Вечер и ночь', ['Родители через стену от детской: Нико 3 года, его слышно.', 'Ночью в туалет: кровать → гардеробная с боковой подсветкой → санузел. Из спальни не выходите, детей не будите.', 'Варя может засидеться допоздна: её комната дальше всех от спален, через стену только Майя.']],
+];
+function drawDays() {
+  const n = document.getElementById('days'); n.innerHTML = '';
+  DAYS.forEach(([h, items]) => { const c = document.createElement('div'); c.className = 'card'; c.innerHTML = `<h2>${h}</h2><ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>`; n.appendChild(c); });
+}
+function drawErgo() {
+  const v = V(); const t = document.getElementById('ergo'); const e = v.ergo || [];
+  const cnt = s => e.filter(x => x.status === s).length;
+  document.getElementById('ergoLead').textContent = `Перед каждым шкафом, кроватью, столом, сантехникой и кухней проверено свободное место по нормам эргономики жилья. Проверены и все распашные двери: открываются ли до конца. Всего ${e.length} проверок: ${cnt('ok')} с запасом, ${cnt('tight')} по минимуму, ${cnt('bad')} нарушений. На плане их видно по кнопке «Зоны подхода».`;
+  const rank = { bad: 0, tight: 1, ok: 2 };
+  const rows = [...e].sort((a, b) => rank[a.status] - rank[b.status] || a.room.localeCompare(b.room, 'ru'));
+  const label = { ok: 'с запасом', tight: 'по минимуму', bad: 'мало места' };
+  t.innerHTML = `<thead><tr><th>Помещение</th><th>Что проверяли</th><th style="text-align:right">Есть, мм</th><th style="text-align:right">Норма, мм</th><th>Итог</th></tr></thead><tbody>` +
+    rows.map(x => `<tr><td>${x.room}</td><td>${x.item === 'дверь' ? 'дверь' : x.item}<small style="display:block;color:var(--muted)">${x.what}</small></td><td class="num">${x.type === 'door' ? '—' : x.got >= 1500 ? '≥ 1500' : x.got}</td><td class="num">${x.type === 'door' ? '—' : x.need + '–' + x.comfy}</td><td><span class="pill ${x.status}">${label[x.status]}</span></td></tr>`).join('') + '</tbody>';
+}
 function drawNotes() {
   const n = document.getElementById('notes'); n.innerHTML = '';
-  [...NOTES[S.v], ...NOTES.common].forEach(([h, items]) => {
+  [...(NOTES[S.v] || []), ...NOTES.common].forEach(([h, items]) => {
     const c = document.createElement('div'); c.className = 'card';
     c.innerHTML = `<h2>${h}</h2><ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>`; n.appendChild(c);
   });
@@ -383,7 +425,8 @@ function setPressed(ids, on) { ids.forEach(i => $(i).setAttribute('aria-pressed'
 function setVariant(v) {
   S.v = v; save(); setPressed(['vA', 'vB'], 'v' + v);
   const vv = V(); $('vTitle').textContent = vv.title; $('vSummary').textContent = vv.summary;
-  drawRooms(); drawNotes(); drawPlan(); if (window.__3d) window.__3d.rebuild();
+  drawRooms(); drawNotes(); drawDays(); drawErgo(); drawPlan(); if (window.__3d) window.__3d.rebuild();
+  document.querySelector('.seg[aria-label="Вариант"]').hidden = P.variants.length < 2;
 }
 function setMode(m) {
   S.mode = m; setPressed(['mPlan', 'mOrbit', 'mWalk'], { plan: 'mPlan', orbit: 'mOrbit', walk: 'mWalk' }[m]);
@@ -400,6 +443,7 @@ $('vA').onclick = () => setVariant('A'); $('vB').onclick = () => setVariant('B')
 $('mPlan').onclick = () => setMode('plan'); $('mOrbit').onclick = () => setMode('orbit'); $('mWalk').onclick = () => setMode('walk');
 $('lFurn').onclick = () => { S.furn = !S.furn; $('lFurn').setAttribute('aria-pressed', S.furn); drawPlan(); };
 $('lDemo').onclick = () => { S.demo = !S.demo; $('lDemo').setAttribute('aria-pressed', S.demo); drawPlan(); };
+$('lErgo').onclick = () => { S.ergo = !S.ergo; $('lErgo').setAttribute('aria-pressed', S.ergo); drawPlan(); };
 $('lDims').onclick = () => { S.grid = !S.grid; $('lDims').setAttribute('aria-pressed', S.grid); drawPlan(); };
 $('fit').onclick = fitPlan;
 addEventListener('resize', updScale);
@@ -545,6 +589,21 @@ function build(f) {
       if (t === 'chair') box(W * .9, .4, .03, MAT.oak, 0, .48, bz + .06, inner);
       break; }
     case 'pouf': cyl(Math.min(W, D) / 2, .42, MAT.sage, 0, 0, 0, inner, 32); break;
+    case 'bench': { box(W, .4, D, MAT.oak, 0, .05, 0, inner); box(W - .04, .08, D - .04, MAT.sage, 0, .45, 0, inner, .03); box(W - .1, .02, .01, MAT.graphite, 0, .2, fz + .005, inner); break; }
+    case 'robot': cyl(.17, .1, MAT.graphite, 0, 0, 0, inner, 32); break;
+    case 'hooks': { box(W, .12, .03, MAT.oak, 0, 1.1, bz + .015, inner); const n = Math.floor(W / .25); for (let i = 0; i < n; i++) { box(.03, .06, .08, MAT.graphite, -W / 2 + (i + .5) * W / n, 1.05, bz + .06, inner); if (i % 2 === 0) box(.3, .55, .12, i % 4 ? MAT.blanketBlue : MAT.blanketTerra, -W / 2 + (i + .5) * W / n, .52, bz + .1, inner, .03); } break; }
+    case 'loft': {
+      // платформа на 1,35 м, матрас, бортик с открытой стороны, лестница у торца
+      const pz = 1.35;
+      [[-W / 2 + .03, bz + .03], [W / 2 - .03, bz + .03], [-W / 2 + .03, fz - .03], [W / 2 - .03, fz - .03]].forEach(([x, z]) => box(.07, pz + .4, .07, MAT.oak, x, 0, z, inner));
+      box(W, .06, D, MAT.oak, 0, pz, 0, inner);
+      box(W - .06, .15, D - .06, MAT.linen, 0, pz + .06, 0, inner, .04);
+      box(Math.min(.6, W * .3), .12, D - .2, MAT.pillow, -W / 2 + .35, pz + .21, 0, inner, .05);
+      box(W * .55, .04, D - .04, ex.under === 'bed' ? MAT.blanketBlue : MAT.blanketSage, W * .2, pz + .2, 0, inner, .02);
+      box(W * .75, .3, .04, MAT.oak, -W * .125, pz + .06, fz - .02, inner);
+      for (let i = 0; i < 5; i++) box(.4, .03, .04, MAT.oak, W / 2 - .25, .27 * (i + 1), fz + .03, inner);
+      box(.03, pz + .2, .04, MAT.oak, W / 2 - .45, 0, fz + .03, inner); box(.03, pz + .2, .04, MAT.oak, W / 2 - .05, 0, fz + .03, inner);
+      break; }
     case 'nightstand': {
       if (Z > 0) box(W, H, D, MAT.oak, 0, Z, 0, inner); else box(W, H, D, MAT.oak, 0, 0, 0, inner);
       box(.14, .03, .14, MAT.led, 0, (Z || 0) + H, 0, inner); break; }
@@ -729,7 +788,7 @@ function rebuild() {
 
 // ---------- режимы камеры ----------
 let mode = 'orbit', cut = true;
-const CLIP = [new THREE.Plane(new THREE.Vector3(0, -1, 0), 1.3)];
+const CLIP = [new THREE.Plane(new THREE.Vector3(0, -1, 0), 1.9)];
 const headLamp = new THREE.PointLight(0xfff1dc, 0, 9, 1.4); camera.add(headLamp); scene.add(camera);
 const amb = new THREE.AmbientLight(0xffffff, 0); scene.add(amb);
 const walk = { pos: new THREE.Vector3(5.0, 1.6, 6.3), yaw: Math.PI, pitch: 0, keys: {} };
@@ -753,7 +812,13 @@ function goRoom(r) {
   const [cx, cy] = r.label.map(m);
   if (mode === 'walk') {
     // встаём у «входной» стороны помещения: ищем свободную точку
-    walk.pos.set(cx, 1.6, cy); walk.pitch = 0; walk.yaw = 0;
+    walk.pos.set(cx, 1.6, cy); walk.pitch = -0.12;
+    // смотрим туда, где дальше всего видно
+    let best = 0, bestYaw = 0;
+    for (let k = 0; k < 24; k++) { const yaw = k / 24 * Math.PI * 2; const fx = -Math.sin(yaw), fz = -Math.cos(yaw); let d = 0; while (d < 8 && !blocked(cx + fx * d, cy + fz * d)) d += .1; if (d > best) { best = d; bestYaw = yaw; } }
+    // отходим назад, чтобы видеть комнату целиком
+    const bx = Math.sin(bestYaw), bz = Math.cos(bestYaw); let back = 0; while (back < 1.6 && !blocked(cx + bx * (back + .1), cy + bz * (back + .1))) back += .1;
+    walk.pos.set(cx + bx * Math.max(0, back - .3), 1.6, cy + bz * Math.max(0, back - .3)); walk.yaw = bestYaw;
   } else {
     const tgt = new THREE.Vector3(cx, 0, cy);
     const off = camera.position.clone().sub(controls.target).setLength(9);
