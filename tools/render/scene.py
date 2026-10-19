@@ -731,6 +731,9 @@ def thickness_at(walls_u, a, b, end, along_sign):
     return inter
 
 
+CUT = None  # область плана (shapely, мм), где для разреза убраны стены
+
+
 def build(variant, style_key, K):
     data = json.load(open(os.path.join(ROOT, 'data', 'project.json')))
     v = next(x for x in data['variants'] if x['id'] == variant)
@@ -751,6 +754,15 @@ def build(variant, style_key, K):
     all_walls = []
     for k in ('mono', 'gas', 'new', 'gkl'):
         for p in polys(v['walls'][k]):
+            if CUT is not None:
+                p = p.difference(CUT)
+                if p.is_empty:
+                    continue
+                if p.geom_type != 'Polygon':
+                    for q in p.geoms:
+                        if q.geom_type == 'Polygon' and q.area > 500:
+                            extrude(q, 0.0, CEIL, K.wall, 'wall_' + k)
+                    continue
             extrude(p, 0.0, CEIL, K.wall, 'wall_' + k)
             all_walls.append(p)
     walls_u = unary_union(all_walls)
@@ -952,6 +964,8 @@ def decorate_rooms(variant, style_key, K, v, root):
         lo.location = (*P(c.x, c.y), CEIL - 0.05)
         link(lo)
         ring = pg.buffer(30, join_style=2).difference(pg.buffer(-12, join_style=2)).difference(door_cuts)
+        if CUT is not None:
+            ring = ring.difference(CUT)
         H = 1.2 if r['name'] == 'Мастер-санузел' else 2.2
         for pr in ([ring] if ring.geom_type == 'Polygon' else ring.geoms):
             if pr.area > 1000:
@@ -1059,12 +1073,16 @@ VIEWS = {
     'kl_kitchen': dict(cam=(7250, 2750), tgt=(11200, 2400), z=1.45, lens=16),
     'master': dict(cam=(11670, 7985), tgt=(15233, 7660), z=1.45, lens=16),
     'kids': dict(cam=(10008, 4874), tgt=(13408, 5083), z=1.35, lens=15),
-    'master_bath': dict(cam=R2N(15.3, -1.75), tgt=R2N(15.95, 2.4), z=1.5, lens=13, exp=0.8),
-    'bath2': dict(cam=R2N(12.55, -1.55), tgt=R2N(12.75, 2.3), z=1.5, lens=13, exp=0.8),
+    # санузлы — «разрезом сквозь стену»: камера снаружи, ближняя плоскость отсечения за стеной
+    'master_bath': dict(cam=R2N(18.4, 0.3), tgt=R2N(14.0, 0.3), z=1.45, lens=18, exp=0.2,
+                        cut=('r', 16.72, -1.86, 17.3, 2.52)),
+    'bath2': dict(cam=R2N(10.5, 0.45), tgt=R2N(14.0, 0.45), z=1.45, lens=18, exp=0.2,
+                  cut=('r', 11.5, 0.22, 12.04, 2.52)),
     'kids2': dict(cam=(R2N(12.4, -4.0)), tgt=(R2N(10.3, -5.6)), z=1.35, lens=15),
     'maya': dict(cam=(4300, 3500), tgt=(5100, 500), z=1.45, lens=15),
-    'varya': dict(cam=(2900, 3450), tgt=(1000, 500), z=1.45, lens=15),
-    'bath3': dict(cam=(1700, 4150), tgt=(500, 6700), z=1.5, lens=14, exp=0.8),
+    'varya': dict(cam=(2450, 3450), tgt=(1300, 300), z=1.45, lens=15),
+    'bath3': dict(cam=(-1500, 5300), tgt=(1500, 5300), z=1.45, lens=18, exp=0.2,
+                  cut=('n', -0.4, 4.18, 0.04, 6.95)),
     'entry': dict(cam=(5150, 6550), tgt=(5900, 3000), z=1.5, lens=15, exp=0.2),
 }
 
@@ -1076,7 +1094,7 @@ def camera(view):
     cam = bpy.data.cameras.new('cam')
     cam.lens = V['lens']
     cam.sensor_width = 36
-    cam.clip_start = 0.05
+    cam.clip_start = V.get('clip', 0.05)
     co = bpy.data.objects.new('cam', cam)
     co.location = (cx, cy, V['z'])
     d = Vector((tx - cx, ty - cy, 0)).normalized()
@@ -1102,6 +1120,16 @@ def main():
     COLL = bpy.context.scene.collection
     random.seed(1)
     K = Kit(STYLES[args.style], args.style)
+    cut = VIEWS[args.view].get('cut')
+    if cut:
+        global CUT
+        fr, x0, y0, x1, y1 = cut
+        pts = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+        if fr == 'r':
+            pts = [R2N(u, w) for u, w in pts]
+        else:
+            pts = [(x * 1000, y * 1000) for x, y in pts]
+        CUT = Polygon(pts)
     v, data = build(args.variant, args.style, K)
     decorate(args.variant, args.style, K, v)
     args.exposure += VIEWS[args.view].get('exp', 0.0)
