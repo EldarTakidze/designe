@@ -78,6 +78,21 @@ table.rooms small{display:block;color:var(--muted);font-size:12px;line-height:1.
 .sect-title{font:700 20px/1.2 var(--f-display);margin:38px 0 6px;text-wrap:balance}
 .lead{color:var(--muted);max-width:75ch;margin:0}
 .q li{list-style:decimal}
+.viz{display:grid;gap:12px;margin-top:14px}
+.viz-main{margin:0;background:var(--sheet);border:1px solid var(--rule)}
+.viz-main img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;background:var(--rule)}
+.viz-main figcaption{font:13px/1.4 var(--f-body);color:var(--muted);padding:10px 14px}
+.viz-thumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.viz-thumbs button{padding:0;border:2px solid transparent;background:none;cursor:pointer;display:block}
+.viz-thumbs button[aria-pressed="true"]{border-color:var(--accent)}
+.viz-thumbs img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+.viz-desc{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:16px;background:var(--sheet);border:1px solid var(--rule);padding:16px}
+@media (max-width:700px){.viz-desc{grid-template-columns:minmax(0,1fr)}}
+.swatches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start}
+.swatches div{font:12px/1.3 var(--f-body);color:var(--muted)}
+.swatches i{display:block;height:34px;border:1px solid var(--rule);margin-bottom:4px}
+.viz-desc ul{margin:0;padding-left:18px}.viz-desc li{margin:4px 0;max-width:70ch}
+.viz-desc h3{font:600 15px/1.3 var(--f-body);margin:0 0 6px}
 .ergo-wrap{overflow-x:auto;background:var(--sheet);border:1px solid var(--rule);margin-top:12px}
 table.ergo{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:560px}
 table.ergo th{font:600 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:12px 14px;border-bottom:1px solid var(--rule)}
@@ -147,6 +162,18 @@ kbd{font:12px var(--f-mono);border:1px solid var(--rule);border-bottom-width:2px
         <div><i style="border:2px solid var(--demo);border-radius:50%;width:10px;height:10px"></i>стояки</div>
       </div>
     </aside>
+  </div>
+
+  <h2 class="sect-title" id="viz">Визуализация: три стиля</h2>
+  <p class="lead">Кухня-гостиная варианта B, рассчитана с реальным солнечным светом. Пол во всех стилях один ламинат на всю квартиру, плитка только в санузлах. Грузинская тема в каждом стиле подана по-своему и без перегруза: древний алфавит асомтаврули, кувшин-квеври, гранаты, мотивы кавказских ковров.</p>
+  <div class="viz">
+    <div class="seg" role="group" aria-label="Стиль" id="vizTabs"></div>
+    <figure class="viz-main"><img id="vizImg" alt="" width="1440" height="900"><figcaption id="vizCap"></figcaption></figure>
+    <div class="viz-thumbs" id="vizThumbs"></div>
+    <div class="viz-desc">
+      <div class="swatches" id="vizSw"></div>
+      <div id="vizText"></div>
+    </div>
   </div>
 
   <h2 class="sect-title">Как разложено</h2>
@@ -398,6 +425,32 @@ const DAYS = [
   ['Гости, 10–15 человек', ['Прихожая принимает гостей без затора: шкаф для верхней одежды у двери, отдельно от семейной гардеробной.', 'Стол раздвигается до 2,8 м, часть гостей сидит на диване. Детские и спальни остаются за поворотом крыла и в левой части, гости туда не ходят.', 'Гостевой санузел вы не захотели, поэтому гости пользуются ванной 2: она у коридора крыла, без прохода через спальни.']],
   ['Вечер и ночь', ['Родители через стену от детской: Нико 3 года, его слышно.', 'Ночью в туалет: кровать → гардеробная с боковой подсветкой → санузел. Из спальни не выходите, детей не будите.', 'Варя может засидеться допоздна: её комната дальше всех от спален, через стену только Майя.']],
 ];
+const VIZ = {
+  warm: { title: 'Тёплый минимализм', sw: [['#C29E74', 'ламинат, дуб натуральный'], ['#ECE5DB', 'стены'], ['#D6CCBF', 'фасады кухни'], ['#E4DCCF', 'диван, букле'], ['#9A6A4E', 'терракота'], ['#B08D57', 'латунь']],
+    text: ['Спокойная тёплая база: натуральный дуб, тёплые белые стены, кухня цвета греж с дубовыми колоннами, светлая каменная столешница.', 'Мягкий диван из букле, акценты терракотой и латунью, льняные шторы, абажуры-барабаны над столом.', 'Грузинская тема: плакат с древним алфавитом асомтаврули (38 букв с подписями мхедрули) над диваном и над ТВ, кувшин-квеври у окна, гранаты на столе.'] },
+  japandi: { title: 'Джапанди', sw: [['#D3B88F', 'ламинат, светлый дуб'], ['#E3DED5', 'стены'], ['#8F9A86', 'фасады, шалфей'], ['#CEC5B5', 'диван, лён'], ['#2B2A28', 'чёрный металл'], ['#D8D2C7', 'микроцемент']],
+    text: ['Самый светлый и тихий вариант: светлый дуб, серо-бежевые стены, кухня шалфейного цвета, колонны из дубовых реек, столешница под микроцемент.', 'Низкий льняной диван, чёрные стулья, бумажные фонари-шары, минимум декора.', 'Грузинская тема: дубовые панели с вырезанными буквами асомтаврули над диваном и над ТВ, квеври из тёмной глины.'] },
+  mix: { title: 'Тбилисская эклектика', sw: [['#A97F56', 'ламинат, тёплый орех'], ['#5A1F2A', 'акцент: саперави'], ['#2F4A3F', 'фасады, тёмно-зелёный'], ['#A65A3C', 'диван, бархат'], ['#C9A04A', 'горчица'], ['#B08D57', 'латунь']],
+    text: ['Смесь стилей с характером: глубокий зелёный на кухне, плитка ручной работы, светлый мрамор на столешнице, терракотовый бархатный диван, гнутые стулья с плетёным сиденьем, латунные светильники-шары.', 'Стена цвета вина саперави за диваном и на колонне с ТВ.', 'Грузинская тема: буквы асомтаврули тон-в-тон на винной стене, ковёр с ромбами, как на кавказских килимах, квеври у окна, гранаты на столе.'] },
+};
+const VIEWS = [['kl_entry', 'Кухня-гостиная от холла: буфет с ТВ на колонне, диван у окна, стол у кухни'], ['kl_window', 'От окна к холлу: стол, буфет, вход в холл и кухонную нишу'], ['kl_kitchen', 'Кухня: холодильник и духовка в колоннах, варочная, мойка у стояка']];
+let vizStyle = 'warm', vizView = 'kl_entry';
+function drawViz() {
+  const tabs = document.getElementById('vizTabs');
+  tabs.innerHTML = Object.entries(VIZ).map(([k, v]) => `<button data-k="${k}" aria-pressed="${k === vizStyle}">${v.title}</button>`).join('');
+  tabs.querySelectorAll('button').forEach(b => b.onclick = () => { vizStyle = b.dataset.k; drawViz(); });
+  const src = (st, vw) => `renders/${st}_${vw}.jpg`;
+  const img = document.getElementById('vizImg');
+  img.src = src(vizStyle, vizView);
+  img.alt = VIZ[vizStyle].title + ': ' + VIEWS.find(v => v[0] === vizView)[1];
+  document.getElementById('vizCap').textContent = VIEWS.find(v => v[0] === vizView)[1];
+  document.getElementById('vizThumbs').innerHTML = VIEWS.map(([k, c]) => `<button data-k="${k}" aria-pressed="${k === vizView}" aria-label="${c}"><img src="${src(vizStyle, k)}" alt="" loading="lazy"></button>`).join('');
+  document.querySelectorAll('#vizThumbs button').forEach(b => b.onclick = () => { vizView = b.dataset.k; drawViz(); });
+  const v = VIZ[vizStyle];
+  document.getElementById('vizSw').innerHTML = v.sw.map(([c, n]) => `<div><i style="background:${c}"></i>${n}</div>`).join('');
+  document.getElementById('vizText').innerHTML = `<h3>${v.title}</h3><ul>${v.text.map(t => `<li>${t}</li>`).join('')}</ul>`;
+}
+drawViz();
 function drawDays() {
   const n = document.getElementById('days'); n.innerHTML = '';
   DAYS.forEach(([h, items]) => { const c = document.createElement('div'); c.className = 'card'; c.innerHTML = `<h2>${h}</h2><ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>`; n.appendChild(c); });

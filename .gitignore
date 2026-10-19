@@ -1,1 +1,3 @@
 __pycache__/
+renders/tex/
+renders/*.png
