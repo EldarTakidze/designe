@@ -79,6 +79,7 @@ table.rooms small{display:block;color:var(--muted);font-size:12px;line-height:1.
 .lead{color:var(--muted);max-width:75ch;margin:0}
 .q li{list-style:decimal}
 .viz{display:grid;gap:12px;margin-top:14px}
+#vizTabs{justify-self:start;flex-wrap:wrap;max-width:100%}
 .viz-main{margin:0;background:var(--sheet);border:1px solid var(--rule)}
 .viz-main img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;background:var(--rule)}
 .viz-main figcaption{font:13px/1.4 var(--f-body);color:var(--muted);padding:10px 14px}
@@ -434,6 +435,7 @@ const VIZ = {
     text: ['Смесь стилей с характером: глубокий зелёный на кухне, плитка ручной работы, светлый мрамор на столешнице, терракотовый бархатный диван, гнутые стулья с плетёным сиденьем, латунные светильники-шары.', 'Стена цвета вина саперави за диваном и на колонне с ТВ.', 'Грузинская тема: буквы асомтаврули тон-в-тон на винной стене, ковёр с ромбами, как на кавказских килимах, квеври у окна, гранаты на столе.'] },
 };
 const VIEWS = [['kl_entry', 'Кухня-гостиная от холла: буфет с ТВ на колонне, диван у окна, стол у кухни'], ['kl_window', 'От окна к холлу: стол, буфет, вход в холл и кухонную нишу'], ['kl_kitchen', 'Кухня: холодильник и духовка в колоннах, варочная, мойка у стояка']];
+const RENDERS = __RENDERS__;
 let vizStyle = 'warm', vizView = 'kl_entry';
 function drawViz() {
   const tabs = document.getElementById('vizTabs');
@@ -444,7 +446,7 @@ function drawViz() {
   img.src = src(vizStyle, vizView);
   img.alt = VIZ[vizStyle].title + ': ' + VIEWS.find(v => v[0] === vizView)[1];
   document.getElementById('vizCap').textContent = VIEWS.find(v => v[0] === vizView)[1];
-  document.getElementById('vizThumbs').innerHTML = VIEWS.map(([k, c]) => `<button data-k="${k}" aria-pressed="${k === vizView}" aria-label="${c}"><img src="${src(vizStyle, k)}" alt="" loading="lazy"></button>`).join('');
+  document.getElementById('vizThumbs').innerHTML = VIEWS.filter(([k]) => RENDERS.includes(vizStyle + '_' + k)).map(([k, c]) => `<button data-k="${k}" aria-pressed="${k === vizView}" aria-label="${c}"><img src="${src(vizStyle, k)}" alt="" loading="lazy"></button>`).join('');
   document.querySelectorAll('#vizThumbs button').forEach(b => b.onclick = () => { vizView = b.dataset.k; drawViz(); });
   const v = VIZ[vizStyle];
   document.getElementById('vizSw').innerHTML = v.sw.map(([c, n]) => `<div><i style="background:${c}"></i>${n}</div>`).join('');
